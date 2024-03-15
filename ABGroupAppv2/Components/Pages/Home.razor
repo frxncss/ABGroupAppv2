@@ -1,20 +1,65 @@
 ﻿@page "/"
+@using ABGroupAppv2.Models
 @inject NavigationManager NavigationManager
 
-@code {
-    protected override void OnInitialized()
-    {
-        NavigationManager.NavigateTo("/login");
-    }
+@if (!IsAuthenticated)
+{
+    <p>Redirecting...</p>
+}
+else
+{
+    <div>
+        <!-- Homepage content here -->
+        <div class="homeheading">
+            <h1>Information</h1>
+        </div>
+        <div class="main">
+            <p>aaaaa</p>
+        </div>
+    </div>
 }
 
-<body>
-    <div class="main">
-        <p>
-            aaaaa
-        </p>
-    </div>
-</body>
+@code {
+    private bool IsAuthenticated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if user is authenticated, if not, redirect to login page
+        var isAuthenticated = await CheckAuthenticationAsync(); // Implement this method to check if the user is authenticated
+        if (!isAuthenticated)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            IsAuthenticated = true;
+        }
+    }
+
+    private async Task<bool> CheckAuthenticationAsync()
+    {
+        // Retrieve authentication token securely
+        try
+        {
+            // Retrieve authentication token securely
+            var authKey = await SecureStorage.GetAsync("IsLoggedIn");
+
+            // Check if authentication token is null or not equal to "Authenticated"
+            if (authKey != null && authKey == "Authenticated")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+}
 
 
 

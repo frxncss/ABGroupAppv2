@@ -1,26 +1,108 @@
 ﻿@page "/login"
+@using ABGroupAppv2.Models
+@using MySql.Data.MySqlClient
+@using Newtonsoft.Json
+@inject NavigationManager NavigationManager
+
 <style>
 
 </style>
 <div class="container">
 	<div class="screen">
 		<div class="screen__content">
-			<img src="https://web.abbey.ie/static/logo/Abbey_Symbol.png" alt="Company Logo" style="width: 100px; margin-bottom: 20px;display: block; margin: 0 auto;">
-			<form class="login">
+			<div class="bg"></div>
+			<div class="bg bg2"></div>
+			<div class="bg bg3"></div>
+			<img src="../abgroupnewlogo.png" style="width: 170px; height: 80px; margin-bottom: 50px;display: block; margin: 0 auto; position: center;">
+            <form class="login" @onsubmit="UserLogin">
 				<div class="login__field">
 					<i class="login__icon fas fa-user"></i>
-					<input type="text" class="login__input" placeholder="Username / Email">
-				</div>
-				<div class="login__field">
-					<i class="login__icon fas fa-lock"></i>
-					<input type="password" class="login__input" placeholder="Password">
-				</div>
-				<button class="button login__submit">
-					<span class="button__text">Log In</span>
-					<i class="button__icon fas fa-chevron-right"></i>
-				</button>
-			</form>
+                    <input type="text" class="login__input" placeholder="Email" @bind="email">
+                </div>
+                <div class="login__field">
+                    <i class="login__icon fas fa-lock"></i>
+                    <input type="password" class="login__input" placeholder="Password" @bind="password">
+                </div>
+                <button type="submit" class="button login__submit">
+                    <span class="button__text">Log In</span>
+                    <i class="button__icon fas fa-chevron-right"></i>
+                </button>
+            </form>
+            <br />
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <p>@errorMessage</p>
+            }
 		</div>
 	</div>
 </div>
 
+@code {
+    private string? email;
+    private string? password;
+    private string? errorMessage;
+
+    private async Task UserLogin()
+    {
+        // Check if email and password are not null or empty
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        {
+            errorMessage = "Email and Password are required.";
+            return;
+        }
+
+        var client = new HttpClient();
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://web.abbey.ie/AbbeyGroupIR/api/Auth/Authenticate");
+        var content = new StringContent(JsonConvert.SerializeObject(new { Email = email, Password = password }), null, "application/json");
+        request.Content = content;
+        try
+        {
+            var response = await client.SendAsync(request);
+            //response.EnsureSuccessStatusCode();
+            var user = (JsonConvert.DeserializeObject<UserDTO>(response.Content.ReadAsStringAsync().Result));
+            if (user != null && user.IsLoggedIn)
+            {
+                // Store authentication token securely
+                await SecureStorage.SetAsync("IsLoggedIn", "Authenticated");
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = "Wrong email address or password. Please try again";
+            }
+
+        }
+        catch(Exception err)
+        {
+            errorMessage = "Failed to Authenticate. Please try again";
+        }
+
+        // // Connect to MySQL database
+        // string connectionString = "YourMySQLConnectionString";
+        // using (MySqlConnection connection = new MySqlConnection(connectionString))
+        // {
+        //     await connection.OpenAsync();
+
+        //     // Query to check if user exists with provided credentials
+        //     string query = "SELECT COUNT(*) FROM Users WHERE Email = @Email AND Password = @Password";
+        //     using (MySqlCommand command = new MySqlCommand(query, connection))
+        //     {
+        //         command.Parameters.AddWithValue("@Email", email);
+        //         command.Parameters.AddWithValue("@Password", password);
+
+        //         int count = (int)await command.ExecuteScalarAsync();
+
+        //         if (count > 0)
+        //         {
+        //             // Authentication successful, navigate to protected home page
+        //             NavigationManager.NavigateTo("/");
+        //         }
+        //         else
+        //         {
+        //             // Authentication failed, display error message
+        //             errorMessage = "Invalid email or password.";
+        //         }
+        //     }
+        // }
+    }
+}

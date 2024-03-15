@@ -20,7 +20,7 @@ namespace ABGroupAppv2
     		builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
-
+            SecureStorage.RemoveAll();
             return builder.Build();
         }
     }
