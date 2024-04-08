@@ -62,6 +62,13 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="DevExpress.Maui.CollectionView" Version="23.2.5" />
+        <PackageReference Include="DevExpress.Maui.Controls" Version="23.2.5" />
+        <PackageReference Include="DevExpress.Maui.DataGrid" Version="23.2.5" />
+        <PackageReference Include="DevExpress.Maui.DataGrid.Export" Version="23.2.5" />
+        <PackageReference Include="DevExpress.Maui.Editors" Version="23.2.5" />
+        <PackageReference Include="DevExpress.Maui.Scheduler" Version="23.2.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.3" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.7" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.7" />
@@ -69,6 +76,15 @@
         <PackageReference Include="MySql.Data" Version="8.3.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="MauiPages\Calendar.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
+      <MauiXaml Update="MauiPages\Views\DayView.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
     </ItemGroup>
 
 </Project>

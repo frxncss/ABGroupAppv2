@@ -11,16 +11,22 @@ else
     <div>
         <!-- Homepage content here -->
         <div class="homeheading">
-            <h1>Information</h1>
+            <h1>Home</h1>
         </div>
         <div class="main">
-            <p>aaaaa</p>
+            <button @onclick="FetchCalendar">My Calendar</button>
         </div>
     </div>
 }
 
 @code {
     private bool IsAuthenticated;
+
+    private void FetchCalendar()
+    {
+        App.Current.MainPage.Navigation.PushAsync(new MauiPages.Calendar());
+        
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -33,6 +39,7 @@ else
         else
         {
             IsAuthenticated = true;
+            App.Current.MainPage.Navigation.PushAsync(new MauiPages.Calendar());
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using DevExpress.Maui;
 
 namespace ABGroupAppv2
 {
@@ -9,6 +10,7 @@ namespace ABGroupAppv2
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseDevExpress()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
