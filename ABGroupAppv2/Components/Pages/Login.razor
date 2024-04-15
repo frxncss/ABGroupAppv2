@@ -26,6 +26,10 @@
                 <button type="submit" class="button login__submit">
                     <span class="button__text">Log In</span>
                     <i class="button__icon fas fa-chevron-right"></i>
+                    @if (isLoading)
+                    {
+                        <div class="spinner"></div>
+                    }
                 </button>
             </form>
             <br />
@@ -41,13 +45,16 @@
     private string? email;
     private string? password;
     private string? errorMessage;
+    private bool isLoading = false;
 
     private async Task UserLogin()
     {
+        isLoading = true;
         // Check if email and password are not null or empty
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
             errorMessage = "Email and Password are required.";
+            isLoading = false;
             return;
         }
 
@@ -75,6 +82,10 @@
         catch(Exception err)
         {
             errorMessage = "Failed to Authenticate. Please try again";
+        }
+        finally
+        {
+            isLoading = false; // Set loading to false when login process ends
         }
 
         // // Connect to MySQL database

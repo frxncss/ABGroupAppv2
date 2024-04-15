@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using DevExpress.Maui;
+using Radzen;
 
 namespace ABGroupAppv2
 {
@@ -17,9 +18,9 @@ namespace ABGroupAppv2
                 });
 
             builder.Services.AddMauiBlazorWebView();
-
+            builder.Services.AddRadzenComponents();
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
             SecureStorage.RemoveAll();

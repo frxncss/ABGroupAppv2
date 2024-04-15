@@ -7,6 +7,11 @@ using System.Collections.ObjectModel;
 
 namespace ABGroupAppv2.MauiPages
 {
+    public class Booking
+    {
+        public string BookingRef {  get; set; }
+        public DateTime ServiceDate { get; set; }
+    }
     public class MedicalAppointment
     {
         public int Id { get; set; }
@@ -15,6 +20,7 @@ namespace ABGroupAppv2.MauiPages
         public string Subject { get; set; }
         public int LabelId { get; set; }
         public string Location { get; set; }
+        public string BookingRef { get; set; }
     }
 
     public class MedicalAppointmentType
@@ -104,6 +110,7 @@ namespace ABGroupAppv2.MauiPages
             medicalAppointment.LabelId = rnd.Next(1, 5);
 
             medicalAppointment.Location = String.Format("{0}", room);
+            medicalAppointment.BookingRef = "BookingTest";
             return medicalAppointment;
         }
 

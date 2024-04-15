@@ -32,4 +32,5 @@ namespace ABGroupAppv2.Models
         public string DropOffDetails { get; set; }
     }
 
+
 }

@@ -1,5 +1,7 @@
 ﻿using DevExpress.Maui.Scheduler;
 using System.ComponentModel;
+using ABGroupAppv2.Models;
+using Microsoft.Maui.Controls;
 
 namespace ABGroupAppv2.MauiPages
 {
@@ -7,7 +9,7 @@ namespace ABGroupAppv2.MauiPages
     {
         public Calendar()
         {
-            BindingContext = new ReceptionDeskViewModel();
+            BindingContext = new GuideViewModel();
             InitializeComponent();
 
         }
@@ -44,33 +46,33 @@ namespace ABGroupAppv2.MauiPages
         //
         //Week View
         //
-        private void WorkWeekView_Tap(object sender, SchedulerGestureEventArgs e)
-        {
-            if (e.AppointmentInfo == null)
-            {
-                ShowNewAppointmentEditWeekPage(e.IntervalInfo);
-                return;
-            }
-            AppointmentItem appointment = e.AppointmentInfo.Appointment;
-            ShowAppointmentEditWeekPage(appointment);
-        }
+        //private void WorkWeekView_Tap(object sender, SchedulerGestureEventArgs e)
+        //{
+        //    if (e.AppointmentInfo == null)
+        //    {
+        //        ShowNewAppointmentEditWeekPage(e.IntervalInfo);
+        //        return;
+        //    }
+        //    AppointmentItem appointment = e.AppointmentInfo.Appointment;
+        //    ShowAppointmentEditWeekPage(appointment);
+        //}
 
-        private void ShowAppointmentEditWeekPage(AppointmentItem appointment)
-        {
-            AppointmentEditPage appEditPage = new AppointmentEditPage(appointment, this.storageweek);
-            Navigation.PushAsync(appEditPage);
-        }
+        //private void ShowAppointmentEditWeekPage(AppointmentItem appointment)
+        //{
+        //    AppointmentEditPage appEditPage = new AppointmentEditPage(appointment, this.storageweek);
+        //    Navigation.PushAsync(appEditPage);
+        //}
 
-        private void ShowNewAppointmentEditWeekPage(IntervalInfo info)
-        {
-            AppointmentEditPage appEditPage = new AppointmentEditPage(info.Start, info.End,
-                                                                     info.AllDay, this.storageweek);
-            Navigation.PushAsync(appEditPage);
-        }
+        //private void ShowNewAppointmentEditWeekPage(IntervalInfo info)
+        //{
+        //    AppointmentEditPage appEditPage = new AppointmentEditPage(info.Start, info.End,
+        //                                                             info.AllDay, this.storageweek);
+        //    Navigation.PushAsync(appEditPage);
+        //}
         //
         //
         //
-        public class ReceptionDeskViewModel : INotifyPropertyChanged
+        public class GuideViewModel : INotifyPropertyChanged
         {
             readonly ReceptionDeskData data;
 
@@ -81,7 +83,7 @@ namespace ABGroupAppv2.MauiPages
 
             public IReadOnlyList<MedicalAppointmentType> AppointmentTypes { get => data.Labels; }
 
-            public ReceptionDeskViewModel()
+            public GuideViewModel()
             {
                 data = new ReceptionDeskData();
             }
@@ -95,12 +97,12 @@ namespace ABGroupAppv2.MauiPages
     }
 }
 
-    //public class Employee
-    //{
-    //    public string Name { get; set; }
-    //    public DateTime BirthDate { get; set; }
-    //    public bool OnLeave { get; set; }
+//public class Employee
+//{
+//    public string Name { get; set; }
+//    public DateTime BirthDate { get; set; }
+//    public bool OnLeave { get; set; }
 
-    //}
+//}
 
 
