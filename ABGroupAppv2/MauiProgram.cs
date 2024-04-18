@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using DevExpress.Maui;
+using Radzen;
 
 namespace ABGroupAppv2
 {
@@ -10,16 +11,15 @@ namespace ABGroupAppv2
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-                .UseDevExpress()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
             builder.Services.AddMauiBlazorWebView();
-
+            builder.Services.AddRadzenComponents();
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
             SecureStorage.RemoveAll();
