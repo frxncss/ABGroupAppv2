@@ -2,6 +2,7 @@
 @using ABGroupAppv2.Models
 @using MySql.Data.MySqlClient
 @using Newtonsoft.Json
+@using ABGroupAppv2.Components
 @inject NavigationManager NavigationManager
 
 <style>
@@ -88,32 +89,5 @@
             isLoading = false; // Set loading to false when login process ends
         }
 
-        // // Connect to MySQL database
-        // string connectionString = "YourMySQLConnectionString";
-        // using (MySqlConnection connection = new MySqlConnection(connectionString))
-        // {
-        //     await connection.OpenAsync();
-
-        //     // Query to check if user exists with provided credentials
-        //     string query = "SELECT COUNT(*) FROM Users WHERE Email = @Email AND Password = @Password";
-        //     using (MySqlCommand command = new MySqlCommand(query, connection))
-        //     {
-        //         command.Parameters.AddWithValue("@Email", email);
-        //         command.Parameters.AddWithValue("@Password", password);
-
-        //         int count = (int)await command.ExecuteScalarAsync();
-
-        //         if (count > 0)
-        //         {
-        //             // Authentication successful, navigate to protected home page
-        //             NavigationManager.NavigateTo("/");
-        //         }
-        //         else
-        //         {
-        //             // Authentication failed, display error message
-        //             errorMessage = "Invalid email or password.";
-        //         }
-        //     }
-        // }
     }
 }

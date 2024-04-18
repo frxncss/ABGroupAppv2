@@ -22,7 +22,7 @@
         <Nullable>enable</Nullable>
 
         <!-- Display name -->
-        <ApplicationTitle>ABGroupAppv2</ApplicationTitle>
+        <ApplicationTitle>AbbeyGroup Go</ApplicationTitle>
 
         <!-- App Identifier -->
         <ApplicationId>com.companyname.abgroupappv2</ApplicationId>
@@ -41,10 +41,11 @@
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#365d59" />
+        <!--<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />-->
 
         <!-- Splash Screen -->
-        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#365d59" BaseSize="128,128" />
 
         <!-- Images -->
         <MauiImage Include="Resources\Images\*" />
@@ -63,11 +64,7 @@
 
     <ItemGroup>
         <PackageReference Include="DevExpress.Maui.CollectionView" Version="23.2.5" />
-        <PackageReference Include="DevExpress.Maui.Controls" Version="23.2.5" />
-        <PackageReference Include="DevExpress.Maui.DataGrid" Version="23.2.5" />
         <PackageReference Include="DevExpress.Maui.DataGrid.Export" Version="23.2.5" />
-        <PackageReference Include="DevExpress.Maui.Editors" Version="23.2.5" />
-        <PackageReference Include="DevExpress.Maui.Scheduler" Version="23.2.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.3" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.7" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.7" />

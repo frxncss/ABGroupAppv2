@@ -1,4 +1,4 @@
-﻿@page "/weather"
+﻿@page "/event"
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
 @using ABGroupAppv2.Models
@@ -61,15 +61,14 @@
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
     {
-
         var copy = new Appointment
-        {
-            Start = args.Data.Start,
-            End = args.Data.End,
-            Text = args.Data.Text
-        };
+            {
+                Start = args.Data.Start,
+                End = args.Data.End,
+                Text = args.Data.Text
+            };
 
-        var data = await DialogService.OpenAsync<EditEvent>("Edit Appointment", new Dictionary<string, object> { { "Appointment", copy } });
+        var data = await DialogService.OpenAsync<EditEvent>("Booking Information", new Dictionary<string, object> { { "Appointment", copy } });
 
         if (data != null)
         {
@@ -80,6 +79,7 @@
         }
 
         await scheduler.Reload();
+
     }
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
