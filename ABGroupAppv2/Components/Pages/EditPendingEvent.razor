@@ -1,0 +1,66 @@
+﻿@inject DialogService DialogService
+@inject NotificationService NotificationService
+@using ABGroupAppv2
+@using System.IO
+@using Microsoft.Maui.ApplicationModel;
+@inject IWordDocumentService WordDocumentService
+
+
+<RadzenTemplateForm TItem="ServiceDetailsDTO" Data="@model">
+    <div class="row" style="margin-bottom: 16px;">
+        <div class="col-md-3">
+            <RadzenLabel Text="Booking Reference:" Style="font-weight: bold;" /><RadzenLabel Text="N/A" Name="BookingRef" />
+        </div>
+        <div class="col-md-3">
+            <RadzenLabel Text="Booking name:" Style="font-weight: bold;" /><RadzenLabel Text="N/A" Name="BookingName" />
+        </div>
+        <div class="col-md-3">
+            <RadzenLabel Text="Consultant:" Style="font-weight: bold;" /><RadzenLabel Text="N/A" Name="ConsultantName" />
+        </div>
+        <div class="col-md-3">
+            <RadzenLabel Text="Agent Name:" Style="font-weight: bold;" /><RadzenLabel Text="N/A" Name="AgentName" />
+        </div>
+        <div class="col-md-3">
+            <RadzenLabel Text="Agent Country:" Style="font-weight: bold;" /><RadzenLabel Text="N/A" Name="AgentCountry" />
+        </div>
+        <div class="col-md-3">
+            <RadzenLabel Text="List of Services:" Style="font-weight: bold;" />
+        </div>
+        <div class="col">
+            <RadzenLabel Text="Services are currently pending. Nothing yet to display." />
+        </div>
+        <div class="col-md-3">
+            <RadzenLabel Text="Itinerary:" Style="font-weight: bold;" />
+        </div>
+        <div class="col">
+            <RadzenButton style="width: 80px" Wrap="FlexWrap.Wrap" Icon="description" BusyText="Opening..." Disabled="true" Text="Open" Size="ButtonSize.Small" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="Booking Start Date:" Style="font-weight: bold;" />
+        </div>
+        <div class="col">
+            <RadzenLabel Text="@model.pickUpDate.ToString("dd/MM/yyyy HH:mm")" />
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 80px">
+        <div class="col-md-3">
+            <RadzenLabel Text="Booking End Date:" Style="font-weight: bold;" />
+        </div>
+        <div class="col">
+            <RadzenLabel Text="@model.dropOffDate.ToString("dd/MM/yyyy HH:mm")" />
+        </div>
+    </div>
+</RadzenTemplateForm>
+@code {
+    [Parameter]
+    public ServiceDetailsDTO ServiceDetails { get; set; }
+
+    ServiceDetailsDTO model = new ServiceDetailsDTO();
+
+    protected override void OnParametersSet()
+    {
+        model = ServiceDetails;
+    }
+}

@@ -1,6 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+﻿/* Unmerged change from project 'ABGroupAppv2 (net8.0-android)'
+Before:
 using DevExpress.Maui;
+After:
+using Microsoft.Extensions.Logging;
+*/
+using Microsoft.Extensions.Logging;
+using ABGroupAppv2.Platforms;
 using Radzen;
+
 
 namespace ABGroupAppv2
 {
@@ -18,9 +25,12 @@ namespace ABGroupAppv2
 
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddRadzenComponents();
+            builder.Services.AddTransient<IWordDocumentService, WordDocumentService>();
+
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+
+            builder.Logging.AddDebug();
 #endif
             SecureStorage.RemoveAll();
             return builder.Build();

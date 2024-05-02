@@ -1,97 +1,169 @@
 ﻿@inject DialogService DialogService
+@inject NotificationService NotificationService
+@using ABGroupAppv2
+@using System.IO
+@using Microsoft.Maui.ApplicationModel;
+@inject IWordDocumentService WordDocumentService
 
-<RadzenTemplateForm TItem="Appointment" Data="@model">
-    <div class="row" style="margin-bottom: 16px">
+<RadzenTemplateForm TItem="ServiceDetailsDTO" Data="@model">
+    <div class="row" style="margin-bottom: 16px;">
         <div class="col-md-3">
-            <RadzenLabel Text="Booking Reference:" Style="font-weight: bold;" /><RadzenLabel Text="@model.Text" Name="BookingRef" />
+            <RadzenLabel Text="Booking Reference:" Style="font-weight: bold;" /><RadzenLabel Text="@model.bookingReference" Name="BookingRef" />
         </div>
         <div class="col-md-3">
-            <RadzenLabel Text="Booking name:" Style="font-weight: bold;" /><RadzenLabel Text="Booking name" Name="BookingName" />
+            <RadzenLabel Text="Booking name:" Style="font-weight: bold;" /><RadzenLabel Text="@model.bookingName" Name="BookingName" />
         </div>
         <div class="col-md-3">
-            <RadzenLabel Text="Consultant:" Style="font-weight: bold;" /><RadzenLabel Text="John Doe" Name="ConsultantName" />
+            <RadzenLabel Text="Consultant:" Style="font-weight: bold;" /><RadzenLabel Text="@model.consultantName" Name="ConsultantName" />
         </div>
         <div class="col-md-3">
-            <RadzenLabel Text="Agent Country:" Style="font-weight: bold;" /><RadzenLabel Text="Germany" Name="AgentCountry" />
+            <RadzenLabel Text="Agent Name:" Style="font-weight: bold;" /><RadzenLabel Text="@model.agentName" Name="AgentName" />
+        </div>
+        <div class="col-md-3">
+            <RadzenLabel Text="Agent Country:" Style="font-weight: bold;" /><RadzenLabel Text="@model.agentCountry" Name="AgentCountry" />
+        </div>
+        <div class="col-md-3">
+            <RadzenLabel Text="List of Services:" Style="font-weight: bold;" />
+        </div>
+        <div class="col">
+            <RadzenAccordion Multiple="true">
+                <Items>
+                    <RadzenAccordionItem Text="Show Services">
+                        <RadzenAccordion Multiple="true">
+                            <Items>
+                                @foreach (var service in model.bookingService)
+                                {
+                                    <RadzenAccordionItem Text="@service.supplierName">
+                                        <RadzenAccordion Multiple="true">
+                                            <Items>
+                                                <RadzenAccordionItem Text="@service.productOptionName">
+                                                    <RadzenAccordion Multiple="true">
+                                                        <Items>
+                                                            <RadzenLabel Text="Pick Up Date:" Style="font-weight: bold;"></RadzenLabel>
+                                                            @service.pickUpDate.ToString("dd/MM/yyyy HH:mm")<br />
+                                                            <RadzenLabel Text="Drop Off Date:" Style="font-weight: bold;"></RadzenLabel>
+                                                            @service.dropOffDate.ToString("dd/MM/yyyy HH:mm")
+                                                            @*<RadzenAccordionItem Text="Pick Up Date">
+                                                                @service.pickUpDate.ToString("dd/MM/yyyy HH:mm")
+                                                            </RadzenAccordionItem>
+                                                            <RadzenAccordionItem Text="Drop Off Date">
+                                                                @service.dropOffDate.ToString("dd/MM/yyyy HH:mm")
+                                                            </RadzenAccordionItem> *@
+                                                            <RadzenAccordionItem Text="See Voucher">
+                                                                <RadzenLink Icon="open_in_browser" Path="@service.serviceVoucher" Text="Open" />
+                                                            </RadzenAccordionItem>
+                                                        </Items>
+                                                    </RadzenAccordion>
+                                                </RadzenAccordionItem>
+                                            </Items>
+                                        </RadzenAccordion>
+                                    </RadzenAccordionItem>
+                                }
+                            </Items>
+                        </RadzenAccordion>
+                    </RadzenAccordionItem>
+                </Items>
+            </RadzenAccordion>
+        </div>
+        <div class="col-md-3">
+            <RadzenLabel Text="Itinerary:" Style="font-weight: bold;" />
+        </div>
+        <div class="col">
+            <RadzenButton style="width: 100px" Wrap="FlexWrap.Wrap" Icon="description" BusyText="Opening" IsBusy=@busy Click=@OnBusyClick Text="Open" Size="ButtonSize.Small" />
         </div>
     </div>
     <div class="row" style="margin-bottom: 16px">
         <div class="col-md-3">
-            <RadzenLabel Text="List of Services" Style="font-weight: bold;" />
+            <RadzenLabel Text="Booking Start Date:" Style="font-weight: bold;" />
         </div>
         <div class="col">
-        @*<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Services </RadzenText> *@
-        <RadzenTree Style="width: 100%; height: 100%">
-            <RadzenTreeItem Text="Service 1">
-                <ChildContent>
-                    <RadzenTreeItem Text="Product Option Name"/>
-                    <RadzenTreeItem Text="Pick up date (26/06/2024)" />
-                    <RadzenTreeItem Text="Drop off date (29/06/2024)" />
-                </ChildContent>
-            </RadzenTreeItem>
-            <RadzenTreeItem Text="Service 2">
-                <ChildContent>
-                    <RadzenTreeItem Text="Product Option Name" />
-                    <RadzenTreeItem Text="Pick up date (30/06/2024)" />
-                    <RadzenTreeItem Text="Drop off date (01/07/2024)" />
-                </ChildContent>
-            </RadzenTreeItem>
-            <RadzenTreeItem Text="Service 3">
-                <ChildContent>
-                    <RadzenTreeItem Text="Product Option Name" />
-                    <RadzenTreeItem Text="Pick up date (01/07/2024)" />
-                    <RadzenTreeItem Text="Drop off date (04/07/2024)" />
-                </ChildContent>
-            </RadzenTreeItem>
-        </RadzenTree>
-        @*<RadzenRequiredValidator Text="Title is required" Component="Text" />*@
-        </div>
-    </div>
-    <div class="row" style="margin-bottom: 16px">
-        <div class="col-md-3">
-            <RadzenLabel Text="Booking Start Date" Style="font-weight: bold;" />
-        </div>
-        <div class="col">
-            <RadzenDatePicker @bind-Value="@model.Start" ReadOnly="true" Name="BookStart" ShowTime="true" />
-            @*<RadzenRequiredValidator Text="Start is required" Component="Start" />*@
+            <RadzenLabel Text="@model.pickUpDate.ToString("dd/MM/yyyy HH:mm")"/>
         </div>
     </div>
     <div class="row" style="margin-bottom: 80px">
         <div class="col-md-3">
-            <RadzenLabel Text="Booking End Date" Style="font-weight: bold;" />
+            <RadzenLabel Text="Booking End Date:" Style="font-weight: bold;" />
         </div>
         <div class="col">
-            <RadzenDatePicker Name="BookEnd" @bind-Value="@model.End" ReadOnly="true" ShowTime="true" />
-            @*<RadzenRequiredValidator Component="End" Text="End is required" />*@
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col">
-            <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Icon="cancel" Text="Close" Click="@Cancel" />
+            <RadzenLabel Text="@model.dropOffDate.ToString("dd/MM/yyyy HH:mm")"/>
         </div>
     </div>
 </RadzenTemplateForm>
 @code {
     [Parameter]
-    public Appointment Appointment { get; set; }
+    public ServiceDetailsDTO ServiceDetails { get; set; }
 
-    Appointment model = new Appointment();
+    ServiceDetailsDTO model = new ServiceDetailsDTO();
 
     protected override void OnParametersSet()
     {
-        model = Appointment;
+        model = ServiceDetails;
     }
 
-    void OnSubmit(Appointment model)
+    bool busy;
+
+    private void OnClick(string text)
     {
-        DialogService.Close(model);
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Button Clicked", Detail = text });
     }
 
-    void Cancel()
+    async Task OnBusyClick()
     {
-        DialogService.Close(model);
+        busy = true;
+        await SaveAndOpenWordDocument();
+        await Task.Delay(2000);
+        busy = false;
     }
 
+    private async Task SaveAndOpenWordDocument()
+    {
+        // Retrieve the file data and file name from model
+        var fileData = model.bookingItinerary.file;
+        var fileName = model.bookingItinerary.fileName;
+
+        // Save the file data as a Word document
+        string filePath = await SaveFileAsync(fileData, fileName);
+
+        // Open the Word document using the file path
+        WordDocumentService.OpenWordDocument(filePath);
+    }
+
+    // Method to save the file data as a Word document and return the file path
+    private async Task<string> SaveFileAsync(byte[] fileData, string fileName)
+    {
+        #if ANDROID
+        // Android-specific code
+        var documentsPath = Platform.CurrentActivity.GetExternalFilesDir(null)?.AbsolutePath;
+        #elif IOS
+        // iOS-specific code
+        var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        #elif MACCATALYST
+        // Mac Catalyst-specific code
+        var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        #elif WINDOWS
+        // Windows-specific code
+        var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        #endif
+
+        // Combine the path with the file name
+        string filePath = Path.Combine(documentsPath, fileName);
+        // // Define a path to save the file
+        // string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
+
+        // Write the file data to the specified path
+        await File.WriteAllBytesAsync(filePath, fileData);
+
+        // Return the file path
+        return filePath;
+    }
+
+    // Method to open the Word document using the Launcher class
+    private async void OpenWordDocument(string filePath)
+    {
+        await Launcher.Default.OpenAsync(new OpenFileRequest
+            {
+                File = new ReadOnlyFile(filePath)
+            });
+    }
 
 }

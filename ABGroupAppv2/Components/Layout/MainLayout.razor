@@ -1,21 +1,83 @@
-﻿﻿
+﻿@inject NavigationManager NavigationManager
 @inherits LayoutComponentBase
 <RadzenComponents/>
-<div class="page">
+<div class="page" style="background-color: #F8F9FB">
     <div class="sidebar">
         <NavMenu/>
     </div>
     <main>
-        <div>
-            <div class="top-row px-4">
-                <a href="https://www.abbeygroup.ie/" target="_blank">Abbey</a>
-            </div>
-            <div>
-                <article class="content px-4">
-                    @Body
-                </article>
-            </div>
-
+        <div class="top-row px-4">
+            @if (!IsAuthenticated)
+            {
+                <button class="Btn">
+                    <div class="sign"><svg viewBox="0 0 512 512"><img src="web.svg"></svg></div>
+                    <a href="https://www.abbeygroup.ie/" style="text-decoration: none; align-items: center;" class="text">Abbey</a>
+                </button>
+            }
+            else
+            {
+                <button class="Btn">
+                    <div class="sign"><svg viewBox="0 0 512 512"><img src="web.svg"></svg></div>
+                    <a href="https://www.abbeygroup.ie/" style="text-decoration: none;" class="text">Abbey</a>
+                </button>
+                <button class="Btn" @onclick="Logout">
+                    <div class="sign"><svg viewBox="0 0 512 512"><img src="exit.svg"></svg></div>
+                    <div class="text">Logout</div>
+                </button>
+            }
         </div>
+        <article class="content px-4">
+            @Body
+        </article>
     </main>
 </div>
+
+@code {
+    private bool IsAuthenticated;
+    protected override async Task OnInitializedAsync()
+    {
+        // Check if user is authenticated, if not, redirect to login page
+        var isAuthenticated = await CheckAuthenticationAsync(); // Implement this method to check if the user is authenticated
+        if (!isAuthenticated)
+        {
+            IsAuthenticated = false;
+        }
+        else
+        {
+            IsAuthenticated = true;
+        }
+    }
+    private async Task Logout()
+    {
+        // Clear the stored authentication data
+        await SecureStorage.SetAsync("IsLoggedIn", "UnAuthorised");
+        var isAuthenticated = await CheckAuthenticationAsync();
+        NavigationManager.NavigateTo("/login", forceLoad: true);
+    }
+
+
+
+    private async Task<bool> CheckAuthenticationAsync()
+    {
+        // Retrieve authentication token securely
+        try
+        {
+            // Retrieve authentication token securely
+            var authKey = await SecureStorage.GetAsync("IsLoggedIn");
+
+            // Check if authentication token is null or not equal to "Authenticated"
+            if (authKey != null && authKey == "Authenticated")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+}

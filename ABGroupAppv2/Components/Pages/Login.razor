@@ -4,42 +4,86 @@
 @using Newtonsoft.Json
 @using ABGroupAppv2.Components
 @inject NavigationManager NavigationManager
+@inject DialogService DialogService
 
-<style>
-
-</style>
 <div class="container">
-	<div class="screen">
-		<div class="screen__content">
 			<div class="bg"></div>
 			<div class="bg bg2"></div>
 			<div class="bg bg3"></div>
-			<img src="../abgroupnewlogo.png" style="width: 170px; height: 80px; margin-bottom: 50px;display: block; margin: 0 auto; position: center;">
-            <form class="login" @onsubmit="UserLogin">
-				<div class="login__field">
-					<i class="login__icon fas fa-user"></i>
-                    <input type="text" class="login__input" placeholder="Email" @bind="email">
-                </div>
-                <div class="login__field">
-                    <i class="login__icon fas fa-lock"></i>
-                    <input type="password" class="login__input" placeholder="Password" @bind="password">
-                </div>
-                <button type="submit" class="button login__submit">
-                    <span class="button__text">Log In</span>
-                    <i class="button__icon fas fa-chevron-right"></i>
-                    @if (isLoading)
+            <div class="screen">
+                <div class="screen__content">
+			        <img src="../abgroupnewlogo.png" style="width: 170px; height: 80px; margin-bottom: 50px;display: block; margin: 0 auto; position: center;"><br/>
+                    <form class="login" @onsubmit="UserLogin">
+				        <div class="login__field">
+					        <i class="login__icon fas fa-user"></i>
+                            <input type="text" class="login__input" placeholder="Email" @bind="email">
+                        </div>
+                        <div class="login__field">
+                            <i class="login__icon fas fa-lock"></i>
+                            <input type="password" class="login__input" placeholder="Password" @bind="password">
+                        </div>
+                        <div>
+                            <a href="/passwordresetevent" style="font-size: 13px;">Forgot Password?</a>
+                        </div>
+                        <br/>
+                        <button type="submit" class="button login__submit">
+                            <span class="button__text">Log In</span>
+                            <i class="button__icon fas fa-chevron-right"></i>
+                            @if (isLoading)
+                            {
+                                <div class="spinner"></div>
+                            }
+                        </button>
+                    </form>
+                    <br/>
+                    @if (!string.IsNullOrEmpty(errorMessage))
                     {
-                        <div class="spinner"></div>
+                        <p>@errorMessage</p>
                     }
-                </button>
-            </form>
-            <br />
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <p>@errorMessage</p>
-            }
-		</div>
-	</div>
+		        </div>
+	        </div>
+    @*      <RadzenTemplateForm Data="@order" Submit="@((Order args) => { Submit(args); })">
+            <RadzenRow Gap="2rem" Class="rz-p-0 rz-p-lg-4">
+                <RadzenColumn Size="6" SizeMD="6">
+                    <RadzenStack>
+                        <RadzenFieldset Text="Password Reset">
+                            <RadzenStack Gap="1rem">
+                                <RadzenRow AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Text="Supplier Code" Component="CardNr" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenTextBox Style="width: 100%;" Name="CardNr" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Text="Email" Component="CardNr" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenTextBox Style="width: 100%;" Name="CardNr" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Text="Password" Component="CardNr" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenTextBox Style="width: 100%;" Name="CardNr" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="4">
+                                        <RadzenLabel Text="ReType Password" Component="CardNr" />
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="12" SizeMD="8">
+                                        <RadzenTextBox Style="width: 100%;" Name="CardNr" />
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RadzenStack>
+                        </RadzenFieldset>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Class="rz-mt-8 rz-mb-4">
+                <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Save" />
+                <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
+            </RadzenStack>
+         </RadzenTemplateForm> *@
 </div>
 
 @code {
@@ -68,11 +112,13 @@
             var response = await client.SendAsync(request);
             //response.EnsureSuccessStatusCode();
             var user = (JsonConvert.DeserializeObject<UserDTO>(response.Content.ReadAsStringAsync().Result));
+            //var test = SecureStorage.GetAsync("IsLoggedIn");
             if (user != null && user.IsLoggedIn)
             {
                 // Store authentication token securely
                 await SecureStorage.SetAsync("IsLoggedIn", "Authenticated");
-                NavigationManager.NavigateTo("/");
+                await SecureStorage.SetAsync("SupplierCode", user.SupplierCode);
+                NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else
             {
@@ -89,5 +135,11 @@
             isLoading = false; // Set loading to false when login process ends
         }
 
+    }
+    private void ShowForgotPasswordDialog()
+    {
+        DialogService.Open<PasswordResetEvent>("Password Reset", new Dictionary<string, object>() {
+            { "Email", email }
+        });
     }
 }

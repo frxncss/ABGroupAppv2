@@ -7,6 +7,8 @@
 
 main {
     min-height: 100vh;
+    align-items: center;
+    justify-content: center;
     flex: 1;
     z-index: 1;
 }
@@ -30,15 +32,135 @@ main {
     z-index: 10;
 }
 
+/*.test {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition-duration: .3s;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+    background-color: rgb(5, 65, 65);
+    padding-right: 1rem;
+}*/
+/*
+    .test:hover {
+        background: rgb(61, 106, 255);
+        box-shadow: 0 0 30px 5px rgba(0, 142, 236, 0.815);
+        -webkit-transition: all 0.2s ease-out;
+        -moz-transition: all 0.2s ease-out;
+        transition: all 0.2s ease-out;
+    }
+        test:hover::before {
+            -webkit-animation: sh02 0.5s 0s linear;
+            -moz-animation: sh02 0.5s 0s linear;
+            animation: sh02 0.5s 0s linear;
+        }
+    test::before {
+        content: '';
+        display: block;
+        width: 0px;
+        height: 86%;
+        position: absolute;
+        top: 7%;
+        left: 0%;
+        opacity: 0;
+        background: #fff;
+        box-shadow: 0 0 50px 30px #fff;
+        -webkit-transform: skewX(-20deg);
+        -moz-transform: skewX(-20deg);
+        -ms-transform: skewX(-20deg);
+        -o-transform: skewX(-20deg);
+        transform: skewX(-20deg);
+    }*/
+.Btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition-duration: .3s;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+  background-color: rgb(5, 65, 65);
+}
+
+/* plus sign */
+.sign {
+    width: 100%;
+    height: 100%;
+    transition-duration: .3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .sign svg {
+        width: 100%;
+        height: 100%;
+    }
+
+        .sign svg image {
+            width: 100%;
+            height: 100%;
+        }
+}
+
+.sign svg path {
+  fill: white;
+}
+/* text */
+.text {
+  position: absolute;
+  right: 0%;
+  width: 0%;
+  opacity: 0;
+  color: white;
+  transition-duration: .3s;
+}
+/* hover effect on button width */
+.Btn:hover {
+  width: 125px;
+  border-radius: 40px;
+  transition-duration: .3s;
+}
+
+.Btn:hover .sign {
+  width: 30%;
+  transition-duration: .3s;
+  padding-left: 20px;
+}
+/* hover effect button's text */
+.Btn:hover .text {
+  opacity: 1;
+  width: 70%;
+  transition-duration: .3s;
+  padding-right: 10px;
+}
+/* button click effect*/
+.Btn:active {
+  transform: translate(2px ,2px);
+}
+
 .top-row {
     background-color: #03332f;
     border-bottom: 1px solid #d6d5d5;
     justify-content: flex-end;
-    height: 4.0rem;
+    height: 5.0rem;
     position: sticky;
     display: flex;
     align-items: center;
     z-index: 1;
+    margin-bottom: 0.5rem;
 }
 
     .top-row ::deep a, .top-row ::deep .btn-link {
@@ -64,6 +186,7 @@ main {
         }
 
 @media (max-width: 640.98px) {
+
     .top-row {
         justify-content: space-between;
         z-index: 1;
@@ -72,6 +195,32 @@ main {
         .top-row ::deep a, .top-row ::deep .btn-link {
             margin-left: 0;
             z-index: 1;
+        }
+    .Btn {
+        justify-content: space-between;
+        width: 125px !important; /* Maintain full width */
+        border-radius: 40px !important; /* Maintain rounded rectangle shape */
+        transition: none !important; /* Remove transitions */
+    }
+
+        .Btn .sign {
+            width: 30% !important; /* Ensure icon area is consistent */
+            padding-left: 20px !important; /* Maintain padding */
+            transition: none !important;
+        }
+
+        .Btn:hover {
+            transition: none !important;
+            background-color: rgba(255,255,255,0.37);
+        }
+
+        .Btn .text {
+            opacity: 1 !important; /* Ensure text is visible */
+            width: 70% !important; /* Ensure text takes up remaining space */
+            transition: none !important;
+            display: flex !important; /* Ensure text is displayed */
+            align-items: center;
+            justify-content: center;
         }
 }
 
@@ -82,7 +231,7 @@ main {
 
     .sidebar {
         width: 250px;
-        height: 100vh;
+        height: 100%;
         position: sticky;
         top: 0;
     }
@@ -103,5 +252,7 @@ main {
     .top-row, article {
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
+
     }
 }
+

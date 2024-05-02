@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ABGroupAppv2.Models
+﻿namespace ABGroupAppv2
 {
-    public class Bookingitinerary
+    public class BookingItineraryDTO
     {
         public string fileName { get; set; }
-        public string file { get; set; }
+        public byte[] file { get; set; }
     }
 }

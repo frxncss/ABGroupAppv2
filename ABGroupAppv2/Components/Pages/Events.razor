@@ -3,106 +3,150 @@
 @inject DialogService DialogService
 @using ABGroupAppv2.Models
 @using ABGroupAppv2.Components.Pages
+@using MySql.Data.MySqlClient
+@using Newtonsoft.Json
+@inject IWordDocumentService WordDocumentService
 
-<RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
-    TextProperty="Text" SelectedIndex="2"
-    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender
-    AppointmentMove=@OnAppointmentMove >
-    <RadzenDayView />
-    <RadzenWeekView />
-    <RadzenMonthView />
-</RadzenScheduler>
-
+@if (!isLoading)
+{
+     <div style="display: flex; justify-content: center; align-items: center; height: 100vh;"> 
+        <RadzenStack AlignItems="AlignItems.Center" Class="rz-m-12" Gap="0.5rem">
+            <RadzenProgressBarCircular Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate"/><br/>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Please Wait</RadzenText>
+        </RadzenStack>
+     </div>
+}
+else{
+    <div class="scheduler-container">
+    <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px; width: auto;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
+        TextProperty="Text" SelectedIndex="2" 
+        AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender>
+        <RadzenDayView StartTime="@TimeSpan.FromHours(0)" EndTime="@TimeSpan.FromHours(24)"/>
+        <RadzenWeekView StartTime="@TimeSpan.FromHours(0)" EndTime="@TimeSpan.FromHours(24)"/>
+        <RadzenMonthView/>
+        <div class="status-indicators">
+            <RadzenRow>
+                <RadzenIcon Icon="circle" IconColor="Green" />
+                <RadzenText TextStyle="TextStyle.Button">Ongoing</RadzenText>
+                <RadzenIcon Icon="circle" IconColor="Red" />
+                <RadzenText TextStyle="TextStyle.Button">Completed</RadzenText>
+                <RadzenIcon Icon="circle" IconColor="Blue" />
+                <RadzenText TextStyle="TextStyle.Button">Pending</RadzenText>
+            </RadzenRow>
+        </div>
+    </RadzenScheduler>
+    </div>
+}
 @code {
     RadzenScheduler<Appointment> scheduler;
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+    // IList<Appointment> appointments = new List<Appointment>
+    // {
+    //     new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "GCNE558577" },
+    //     new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "GMEM559885" },
+    //     new Appointment { Start = DateTime.Today.AddDays(-10), End = DateTime.Today.AddDays(-8), Text = "GMEM559886" },
+    //     new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "GMME563398" },
+    //     new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "GREM550334" },
+    //     new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "GREM550335" },
+    //     0new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "GREM550344" }
+    //GRE013 };
+    bool isLoading = false;
+    DateTime tomorrow = DateTime.Today.AddDays(1);
+    IList<Appointment> appointments = new List<Appointment>();
 
-    IList<Appointment> appointments = new List<Appointment>
+    protected override async Task OnInitializedAsync()
     {
-        new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "GCNE558577" },
-        new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "GMEM559885" },
-        new Appointment { Start = DateTime.Today.AddDays(-10), End = DateTime.Today.AddDays(-8), Text = "GMEM559886" },
-        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "GMME563398" },
-        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "GREM550334" },
-        new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "GREM550335" },
-        new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "GREM550344" },
-    };
+        var today = DateTime.Today;
+        var startOfMonth = new DateTime(today.Year, today.Month, 1);
+        await getBookingService(startOfMonth, startOfMonth.AddMonths(1));
+
+    }
+
+    async Task getBookingService(DateTime initialDate, DateTime finalDate)
+    {
+        var supplier = await SecureStorage.GetAsync("SupplierCode") ?? "KEL004";
+        var client = new HttpClient();
+        var request = new HttpRequestMessage(HttpMethod.Get, $"https://web.abbey.ie/AbbeyGroupIR/api/BHD/GetBookingBySupplier?supplier={supplier}&initialDate={initialDate.ToString("yyyy-MM-dd")}&finalDate={finalDate.ToString("yyyy-MM-dd")}");
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var bookings = (JsonConvert.DeserializeObject<List<SupplierBookingDTO>>(response.Content.ReadAsStringAsync().Result));
+        foreach (var booking in bookings)
+        {
+            var bookingRef = booking.bookingReference;
+            var pickUp = booking.pickUpDate;
+            var dropOff = booking.dropOffDate;
+            appointments.Add(new Appointment { Start = pickUp, End = dropOff, Text = bookingRef });
+        }
+        isLoading = true;
+    }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
+
         // Highlight today in month view
         if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
         {
             args.Attributes["style"] = "background: rgba(255,220,40,.2);";
         }
 
-        // Highlight working hours (9-18)
-        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
+        //Highlight working hours (1-24)
+        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 0 && args.Start.Hour < 23)
         {
             args.Attributes["style"] = "background: rgba(255,220,40,.2);";
         }
-    }
-
-    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
-    {
-        if (args.View.Text != "Year")
-        {
-            Appointment data = await DialogService.OpenAsync<AddEvent>("Add Event",
-                new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
-
-            if (data != null)
-            {
-                appointments.Add(data);
-                // Either call the Reload method or reassign the Data property of the Scheduler
-                await scheduler.Reload();
-            }
-        }
+        // var startOfMonth = new DateTime(2024, 3, 01);
+        // getBookingService(DateTime.Now, DateTime.Now);
     }
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
     {
+        // var bookingRef = args.Data.bookingReference;
+        // var pickUp = args.Data.pickUpDate;
+        // var dropOff = args.Data.dropOffDate;
         var copy = new Appointment
-            {
-                Start = args.Data.Start,
-                End = args.Data.End,
-                Text = args.Data.Text
-            };
+             {
+                 Start = args.Data.Start,
+                 End = args.Data.End,
+                 Text = args.Data.Text
+             };
 
-        var data = await DialogService.OpenAsync<EditEvent>("Booking Information", new Dictionary<string, object> { { "Appointment", copy } });
-
-        if (data != null)
+        var client = new HttpClient();
+        var request = new HttpRequestMessage(HttpMethod.Get, $"https://web.abbey.ie/AbbeyGroupIR/api/BHD/GetBookingItineraryVoucher?bookingReference={args.Data.Text}&pickUpDate={args.Data.Start.ToString("yyyy-MM-dd")}&dropOffDate={args.Data.End.ToString("yyyy-MM-dd")}");
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var booking = (JsonConvert.DeserializeObject<ServiceDetailsDTO>(response.Content.ReadAsStringAsync().Result));
+        booking.pickUpDate = args.Data.Start;
+        booking.dropOffDate = args.Data.End;
+        if(booking.bookingService != null || booking.bookingItinerary != null || booking.consultantName != null)
         {
-            // Update the appointment
-            args.Data.Start = data.Start;
-            args.Data.End = data.End;
-            args.Data.Text = data.Text;
+            var data = await DialogService.OpenAsync<EditEvent>("Booking Information", new Dictionary<string, object> { { "ServiceDetails", booking } });
+        }else
+        {
+            var data = await DialogService.OpenAsync<EditPendingEvent>("Booking Information", new Dictionary<string, object> { { "ServiceDetails", booking } });
         }
-
         await scheduler.Reload();
+        //NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
 
     }
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
     {
-        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
-
-        if (args.Data.Text == "Birthday")
+        DateTime timeprc = args.Data.Start.Date;
+        if (timeprc > DateTime.Today && args.Data.Start > DateTime.Today && args.Data.End > DateTime.Today)
+        {
+            args.Attributes["style"] = "background: blue";
+        }
+        else if (args.Data.Start < DateTime.Today && args.Data.End < DateTime.Today)
         {
             args.Attributes["style"] = "background: red";
         }
-    }
-
-    async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
-    {
-        var draggedAppointment = appointments.FirstOrDefault(x => x == args.Appointment.Data);
-
-        if (draggedAppointment != null)
+        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+        else if (args.Data.Start == DateTime.Today || args.Data.End >= DateTime.Today)
         {
-            draggedAppointment.Start = draggedAppointment.Start + args.TimeSpan;
-
-            draggedAppointment.End = draggedAppointment.End + args.TimeSpan;
-
-            await scheduler.Reload();
+            args.Attributes["style"] = "background: green";
         }
+
+
     }
+
 }

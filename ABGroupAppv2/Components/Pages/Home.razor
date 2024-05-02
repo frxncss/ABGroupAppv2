@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using ABGroupAppv2.Models
+@using Newtonsoft.Json
 @inject NavigationManager NavigationManager
 
 @if (!IsAuthenticated)
@@ -14,10 +15,45 @@ else
             <h1>Home</h1>
         </div>
     </div>
+    <div class="container-fluid">
+        <div class="row">
+             <RadzenCard class="rz-shadow-10">
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3"> All Booking Reference</RadzenText>
+                <RadzenDataGrid Data="@appointments" TItem="Appointment" ColumnWidth="200px" FilterMode="FilterMode.Advanced" 
+                AllowSorting="true" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single"
+                PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="Appointment" Property="Text" Title="Booking Reference" Filterable="false"/>
+                        <RadzenDataGridColumn TItem="Appointment" Property="Start" Title="Start Date"/>
+                    </Columns>
+                </RadzenDataGrid>
+@*                <RadzenRow>
+                    <div class="col-xl-4 mb-4">
+                        <RadzenCard class="rz-border-base-500">
+                            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">1. Booking Reference</RadzenText>
+                            <RadzenDropDown Style="width:200px" TValue="string" Placeholder="Select Booking" AllowFiltering="true" />
+                        </RadzenCard>
+                    </div>
+                    <div class="col-xl-4 mb-4">
+                        <RadzenCard class="rz-border-base-500">
+                            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">2. Start Date</RadzenText>
+                            <RadzenDropDown Style="width:200px" TValue="string" Placeholder="Select Date" AllowFiltering="true" />
+                        </RadzenCard>
+                    </div>
+                </RadzenRow>
+                <div class="col-12 mb-4">
+                    <RadzenCard class="rz-border-base-500">
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Services</RadzenText>
+                    </RadzenCard>
+                </div> *@
+            </RadzenCard>
+        </div>
+    </div>
 }
 
 @code {
     private bool IsAuthenticated;
+    IList<Appointment> appointments = new List<Appointment>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,6 +66,9 @@ else
         else
         {
             IsAuthenticated = true;
+            var today = DateTime.Today;
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            await FetchBookingDetails(startOfMonth, startOfMonth.AddMonths(1));
         }
     }
 
@@ -56,6 +95,25 @@ else
             return false;
         }
     }
+
+    private async Task FetchBookingDetails(DateTime initialDate, DateTime finalDate)
+    {
+        var supplier = await SecureStorage.GetAsync("SupplierCode") ?? "KEL004";
+        var client = new HttpClient();
+        var request = new HttpRequestMessage(HttpMethod.Get, $"https://web.abbey.ie/AbbeyGroupIR/api/BHD/GetBookingBySupplier?supplier={supplier}&initialDate={initialDate.ToString("yyyy-MM-dd")}&finalDate={finalDate.ToString("yyyy-MM-dd")}");
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var bookings = (JsonConvert.DeserializeObject<List<SupplierBookingDTO>>(response.Content.ReadAsStringAsync().Result));
+        foreach (var booking in bookings)
+        {
+            var bookingRef = booking.bookingReference;
+            var pickUp = booking.pickUpDate;
+            var dropOff = booking.dropOffDate;
+            appointments.Add(new Appointment { Start = pickUp, End = dropOff, Text = bookingRef });
+        }
+    }
+
+
 }
 
 
