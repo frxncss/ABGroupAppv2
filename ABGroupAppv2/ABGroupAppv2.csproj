@@ -59,6 +59,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Platforms\Android\Resources\xml\provider_paths.xml" />
       <None Remove="Resources\Images\abbey_group_logo_mono reversed.png" />
     </ItemGroup>
 

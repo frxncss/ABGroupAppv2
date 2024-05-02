@@ -72,6 +72,7 @@
             {
                 // Store authentication token securely
                 await SecureStorage.SetAsync("IsLoggedIn", "Authenticated");
+                await SecureStorage.SetAsync("SupplierCode", user.SupplierCode);
                 NavigationManager.NavigateTo("/");
             }
             else

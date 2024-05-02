@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ABGroupAppv2.Models
+﻿namespace ABGroupAppv2
 {
-    public class Bookingservice
+    public class BookingserviceDTO
     {
         public string supplierName { get; set; }
         public DateTime serviceDate { get; set; }

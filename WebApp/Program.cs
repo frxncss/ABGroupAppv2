@@ -1,5 +1,5 @@
-using WebApp.Components;
 using Radzen;
+using WebApp.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
