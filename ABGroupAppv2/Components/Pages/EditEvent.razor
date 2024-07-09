@@ -94,7 +94,7 @@
         <div class="col">
             <RadzenLabel Text="@model.dropOffDate.ToString("dd/MM/yyyy HH:mm")"/>
         </div>
-    </div> *@
+    </div> 
 </RadzenTemplateForm>
 @code {
     [Parameter]
@@ -164,13 +164,13 @@
         return filePath;
     }
 
-    // Method to open the Word document using the Launcher class
-    private async void OpenWordDocument(string filePath)
-    {
-        await Launcher.Default.OpenAsync(new OpenFileRequest
-            {
-                File = new ReadOnlyFile(filePath)
-            });
-    }
+    // // Method to open the Word document using the Launcher class
+    // private async void OpenWordDocument(string filePath)
+    // {
+    //     await Launcher.Default.OpenAsync(new OpenFileRequest
+    //         {
+    //             File = new ReadOnlyFile(filePath)
+    //         });
+    // }
 
 }

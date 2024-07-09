@@ -6,9 +6,7 @@ using Microsoft.Extensions.Logging;
 */
 using Microsoft.Extensions.Logging;
 using ABGroupAppv2.Platforms;
-After:
 using Microsoft.Extensions.Logging;
-*/
 using Microsoft.Extensions.Logging;
 using ABGroupAppv2.Platforms;
 using Radzen;
