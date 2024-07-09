@@ -65,11 +65,13 @@
                 </Items>
             </RadzenAccordion>
         </div>
-        <div class="col-md-3">
-            <RadzenLabel Text="Itinerary:" Style="font-weight: bold;" />
-        </div>
-        <div class="col">
-            <RadzenButton style="width: 100px" Wrap="FlexWrap.Wrap" Icon="description" BusyText="Opening" IsBusy=@busy Click=@OnBusyClick Text="Open" Size="ButtonSize.Small" />
+        <div class="row" style="margin-bottom: 4px">
+            <div class="col-md-3">
+                <RadzenLabel Text="Itinerary:" Style="font-weight: bold;" />
+            </div>
+            <div class="col">
+                <RadzenButton style="width: 100px" Wrap="FlexWrap.Wrap" Icon="description" BusyText="Opening" IsBusy=@busy Click=@OnBusyClick Text="Open" Size="ButtonSize.Small" />
+            </div>
         </div>
     </div>
     <div class="row" style="margin-bottom: 16px">
