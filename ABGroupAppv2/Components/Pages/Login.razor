@@ -23,7 +23,7 @@
                             <input type="password" class="login__input" placeholder="Password" @bind="password">
                         </div>
                         <div>
-                            <a href="/passwordresetevent" style="font-size: 13px;">Forgot Password?</a>
+                            <a href="/passwordresetevent" style="font-size: 13px;">Forgot Password ?</a>
                         </div>
                         <br/>
                         <button type="submit" class="button login__submit">
@@ -118,6 +118,8 @@
                 // Store authentication token securely
                 await SecureStorage.SetAsync("IsLoggedIn", "Authenticated");
                 await SecureStorage.SetAsync("SupplierCode", user.SupplierCode);
+                await SecureStorage.SetAsync("Email", user.Email);
+                await SecureStorage.SetAsync("Name", user.Name);
                 NavigationManager.NavigateTo("/", forceLoad: true);
             }
             else

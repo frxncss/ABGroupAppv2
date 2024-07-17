@@ -1,0 +1,33 @@
+﻿@page "/profile"
+@using Models
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+
+<RadzenCard Style="height: auto; width: auto; box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);" class="rz-border-radius-3">
+    <RadzenText TextStyle="TextStyle.Overline"><b>Profile Information</b></RadzenText>
+    <RadzenCard Style="border-radius: 15px;" class="rz-shadow-8">
+        <div style="text-align: center;">
+            <RadzenIcon Icon="account_circle" Style="font-size: 100px; color: #4CAF50;" />
+            <br />
+            <br />
+            <div style="padding: 10px;">
+                <RadzenText TextStyle="TextStyle.Body2"><b>Supplier Code:</b> @user.SupplierCode</RadzenText><br />
+                <RadzenText TextStyle="TextStyle.Body2"><b>Email:</b> @user.Email</RadzenText><br />
+                <RadzenText TextStyle="TextStyle.Body2"><b>Name:</b> @user.Name</RadzenText><br />
+            </div>
+        </div>
+    </RadzenCard>
+</RadzenCard>
+
+@code {
+    private UserDTO user = new UserDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user.SupplierCode = await SecureStorage.GetAsync("SupplierCode");
+        user.Email = await SecureStorage.GetAsync("Email");
+        user.Name = await SecureStorage.GetAsync("Name");
+    }
+
+
+}

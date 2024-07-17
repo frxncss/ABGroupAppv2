@@ -19,10 +19,8 @@
 else{
     <div class="scheduler-container">
     <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px; width: auto;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
-        TextProperty="Text" SelectedIndex="2" 
+        TextProperty="Text" SelectedIndex="0" 
         AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender>
-        <RadzenDayView StartTime="@TimeSpan.FromHours(0)" EndTime="@TimeSpan.FromHours(24)"/>
-        <RadzenWeekView StartTime="@TimeSpan.FromHours(0)" EndTime="@TimeSpan.FromHours(24)"/>
         <RadzenMonthView/>
         <div class="status-indicators">
             <RadzenRow>
@@ -92,10 +90,10 @@ else{
         }
 
         //Highlight working hours (1-24)
-        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 0 && args.Start.Hour < 23)
-        {
-            args.Attributes["style"] = "background: rgba(255,220,40,.2);";
-        }
+        // if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 0 && args.Start.Hour < 23)
+        // {
+        //     args.Attributes["style"] = "background: rgba(255,220,40,.2);";
+        // }
         // var startOfMonth = new DateTime(2024, 3, 01);
         // getBookingService(DateTime.Now, DateTime.Now);
     }

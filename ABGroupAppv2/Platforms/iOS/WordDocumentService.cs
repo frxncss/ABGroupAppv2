@@ -14,10 +14,8 @@ namespace ABGroupAppv2.Platforms
         {
             // Get the file URL
             var fileUrl = NSUrl.FromFilename(filePath);
-
             // Create a UIDocumentInteractionController
             var documentController = UIDocumentInteractionController.FromUrl(fileUrl);
-
             // Present the document interaction controller
             documentController.PresentPreview(true);
         }

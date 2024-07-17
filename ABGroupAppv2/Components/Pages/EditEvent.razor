@@ -42,7 +42,7 @@
                                                             <RadzenLabel Text="Pick Up Date:" Style="font-weight: bold;"></RadzenLabel>
                                                             @service.pickUpDate.ToString("dd/MM/yyyy HH:mm")<br />
                                                             <RadzenLabel Text="Drop Off Date:" Style="font-weight: bold;"></RadzenLabel>
-                                                            @service.dropOffDate.ToString("dd/MM/yyyy HH:mm")
+                                                            @service.dropOffDate.AddHours(23).AddMinutes(59).ToString("dd/MM/yyyy HH:mm")
                                                             @*<RadzenAccordionItem Text="Pick Up Date">
                                                                 @service.pickUpDate.ToString("dd/MM/yyyy HH:mm")
                                                             </RadzenAccordionItem>
@@ -112,12 +112,12 @@
     async Task OnBusyClick()
     {
         busy = true;
-        await SaveAndOpenWordDocument();
+        await OpenWordDocument();
         await Task.Delay(2000);
         busy = false;
     }
 
-    private async Task SaveAndOpenWordDocument()
+    private async Task OpenWordDocument()
     {
         // Retrieve the file data and file name from model
         var fileData = model.bookingItinerary.file;

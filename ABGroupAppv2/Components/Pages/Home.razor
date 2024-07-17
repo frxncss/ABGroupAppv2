@@ -5,55 +5,75 @@
 
 @if (!IsAuthenticated)
 {
-    <p>Redirecting...</p>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+        <RadzenStack AlignItems="AlignItems.Center" Class="rz-m-12" Gap="0.5rem">
+            <RadzenProgressBarCircular Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" /><br />
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Please Wait</RadzenText>
+        </RadzenStack>
+    </div>
 }
 else
 {
-    <div>
-        <!-- Homepage content here -->
-        <div class="homeheading">
-            <h1>Home</h1>
+        <div>
+            <!-- Homepage content here -->
+            <div class="homeheading">
+                <h1>Home</h1>
+            </div>
         </div>
-    </div>
-    <div class="container-fluid">
-        <div class="row">
-             <RadzenCard class="rz-shadow-10">
-                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3"> All Booking Reference</RadzenText>
-                <RadzenDataGrid Data="@appointments" TItem="Appointment" ColumnWidth="200px" FilterMode="FilterMode.Advanced" 
-                AllowSorting="true" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single"
-                PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
-                    <Columns>
-                        <RadzenDataGridColumn TItem="Appointment" Property="Text" Title="Booking Reference" Filterable="false"/>
-                        <RadzenDataGridColumn TItem="Appointment" Property="Start" Title="Start Date"/>
-                    </Columns>
-                </RadzenDataGrid>
-@*                <RadzenRow>
-                    <div class="col-xl-4 mb-4">
+        <div class="container-fluid">
+            <div class="row">
+                 <RadzenCard class="rz-shadow-10">
+                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Schedule</RadzenText>
+                <RadzenDataGrid Data="@filteredAppointments" TItem="Appointment" AllowColumnResize="true" AllowFiltering="true" FilterMode="FilterMode.CheckBoxList"
+                                FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowSorting="true" SelectionMode="DataGridSelectionMode.Single"
+                                PagerHorizontalAlign="HorizontalAlign.Left" PageSize="3" ExpandMode="DataGridExpandMode.Single">
+                        <Template>
+                            <RadzenCard Style="margin-bottom:20px" class="rz-border-primary">
+                                <b>Information:</b>
+                                <RadzenAccordion Multiple="true">
+
+                                </RadzenAccordion>
+                            </RadzenCard>
+                        </Template>
+
+                        <Columns>
+                                <RadzenDataGridColumn TItem="Appointment" Property="Text" Title="Booking Reference"/>
+@*                                 <RadzenDataGridColumn TItem="Appointment" Property="Start" Title="Start Date" >
+                                    <Template Context="appointment">
+                                        @((appointment.Start.TimeOfDay == TimeSpan.Zero) ? $"{appointment.Start:dd/MM/yyyy} - All Day" : appointment.Start.ToString("dd/MM/yyyy - HH:mm"))
+                                    </Template>
+                                </RadzenDataGridColumn> *@
+                        </Columns>
+                    </RadzenDataGrid>
+    @*                <RadzenRow>
+                        <div class="col-xl-4 mb-4">
+                            <RadzenCard class="rz-border-base-500">
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">1. Booking Reference</RadzenText>
+                                <RadzenDropDown Style="width:200px" TValue="string" Placeholder="Select Booking" AllowFiltering="true" />
+                            </RadzenCard>
+                        </div>
+                        <div class="col-xl-4 mb-4">
+                            <RadzenCard class="rz-border-base-500">
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">2. Start Date</RadzenText>
+                                <RadzenDropDown Style="width:200px" TValue="string" Placeholder="Select Date" AllowFiltering="true" />
+                            </RadzenCard>
+                        </div>
+                    </RadzenRow>
+                    <div class="col-12 mb-4">
                         <RadzenCard class="rz-border-base-500">
-                            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">1. Booking Reference</RadzenText>
-                            <RadzenDropDown Style="width:200px" TValue="string" Placeholder="Select Booking" AllowFiltering="true" />
+                            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Services</RadzenText>
                         </RadzenCard>
-                    </div>
-                    <div class="col-xl-4 mb-4">
-                        <RadzenCard class="rz-border-base-500">
-                            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">2. Start Date</RadzenText>
-                            <RadzenDropDown Style="width:200px" TValue="string" Placeholder="Select Date" AllowFiltering="true" />
-                        </RadzenCard>
-                    </div>
-                </RadzenRow>
-                <div class="col-12 mb-4">
-                    <RadzenCard class="rz-border-base-500">
-                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Services</RadzenText>
-                    </RadzenCard>
-                </div> *@
-            </RadzenCard>
+                    </div> *@
+                </RadzenCard>
+            </div>
         </div>
-    </div>
 }
 
 @code {
     private bool IsAuthenticated;
+    DateTime today = DateTime.Today;
     IList<Appointment> appointments = new List<Appointment>();
+    IList<Appointment> filteredAppointments = new List<Appointment>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,11 +129,23 @@ else
             var bookingRef = booking.bookingReference;
             var pickUp = booking.pickUpDate;
             var dropOff = booking.dropOffDate;
-            appointments.Add(new Appointment { Start = pickUp, End = dropOff, Text = bookingRef });
+            appointments.Add(new Appointment { Start = pickUp, End = dropOff.AddMinutes(-1), Text = bookingRef });
+
+        }
+        foreach (var events in appointments)
+        {
+            if (today >= events.Start && today <= events.End)
+            {
+                filteredAppointments.Add(events);
+            }
         }
     }
 
-
+    // private void FilterAppointmentsForToday()
+    // {
+    //     var today = DateTime.Today;
+    //     filteredAppointments = appointments.Where(a => a.Start.Date == today).ToList();
+    // }
 }
 
 
