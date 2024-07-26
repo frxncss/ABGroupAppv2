@@ -1,31 +1,55 @@
-﻿@inject DialogService DialogService
-@inject NotificationService NotificationService
-@using ABGroupAppv2
+﻿@using ABGroupAppv2
 @using System.IO
-@using Microsoft.Maui.ApplicationModel;
+@using System.Text.Encodings.Web
+@using Microsoft.Maui.ApplicationModel
+@using System.Net
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
 @inject IWordDocumentService WordDocumentService
+@inject DialogService DialogService
+@inject NotificationService NotificationService
 
-<RadzenTemplateForm TItem="ServiceDetailsDTO" Data="@model">
+<RadzenTemplateForm TItem="BookingFinalDocsDTO" Data="@model">
     <div class="row" style="margin-bottom: 16px;">
         <div class="col-md-3">
             <RadzenLabel Text="Booking Reference:" Style="font-weight: bold;" /><RadzenLabel Text="@model.bookingReference" Name="BookingRef" />
-        </div>
+        </div><br />
         <div class="col-md-3">
             <RadzenLabel Text="Booking name:" Style="font-weight: bold;" /><RadzenLabel Text="@model.bookingName" Name="BookingName" />
-        </div>
+        </div><br />
         <div class="col-md-3">
             <RadzenLabel Text="Consultant:" Style="font-weight: bold;" /><RadzenLabel Text="@model.consultantName" Name="ConsultantName" />
-        </div>
+        </div><br />
         <div class="col-md-3">
             <RadzenLabel Text="Agent Name:" Style="font-weight: bold;" /><RadzenLabel Text="@model.agentName" Name="AgentName" />
-        </div>
+        </div><br />
         <div class="col-md-3">
             <RadzenLabel Text="Agent Country:" Style="font-weight: bold;" /><RadzenLabel Text="@model.agentCountry" Name="AgentCountry" />
+        </div><br />
+        <div class="col-md-3 ">
+                <RadzenLabel Text="PAX:" Style="font-weight: bold;" />
+                <div class="col" style="width: 200px;">
+                    <RadzenAccordion Multiple="true">
+                        <Items>
+                            <RadzenAccordionItem Text="Show Details">
+
+                                    <RadzenLabel>Adults: @ServiceDetails.adults</RadzenLabel>
+                                    <RadzenLabel>Guides: @ServiceDetails.guides</RadzenLabel>
+                                    <RadzenLabel>Children: @ServiceDetails.children</RadzenLabel>
+                                    <RadzenLabel>Drivers: @ServiceDetails.drivers</RadzenLabel>
+                                    <RadzenLabel>Tourleaders: @ServiceDetails.tourLeader</RadzenLabel>
+                                
+
+                            </RadzenAccordionItem>
+                        </Items>
+                    </RadzenAccordion>
+                </div>
+        </div>
         </div>
         <div class="col-md-3">
             <RadzenLabel Text="List of Services:" Style="font-weight: bold;" />
         </div>
-        <div class="col">
+        <div class="col" style="margin-bottom: 16px">
             <RadzenAccordion Multiple="true">
                 <Items>
                     <RadzenAccordionItem Text="Show Services">
@@ -36,21 +60,26 @@
                                     <RadzenAccordionItem Text="@service.supplierName">
                                         <RadzenAccordion Multiple="true">
                                             <Items>
-                                                <RadzenAccordionItem Text="@service.productOptionName">
+                                                <RadzenAccordionItem Text="Contact Number" Style="font-weight: bold;" Selected="true" Icon="phone"><a href="tel:@service.supplierPhone" style="text-decoration:none;">@service.supplierPhone</a></RadzenAccordionItem>
+                                                <RadzenAccordionItem Text="@service.productOptionName" class="rz-accordion-item">
                                                     <RadzenAccordion Multiple="true">
                                                         <Items>
+                                                            @* @((MarkupString)service.roomingList) *@
                                                             <RadzenLabel Text="Pick Up Date:" Style="font-weight: bold;"></RadzenLabel>
-                                                            @service.pickUpDate.ToString("dd/MM/yyyy HH:mm")<br />
+                                                            @(service.pickUpDate.TimeOfDay == TimeSpan.Zero ? service.pickUpDate.ToString("dd/MM/yyyy") : service.pickUpDate.ToString("dd/MM/yyyy HH:mm"))<br />
                                                             <RadzenLabel Text="Drop Off Date:" Style="font-weight: bold;"></RadzenLabel>
-                                                            @service.dropOffDate.AddHours(23).AddMinutes(59).ToString("dd/MM/yyyy HH:mm")
-                                                            @*<RadzenAccordionItem Text="Pick Up Date">
-                                                                @service.pickUpDate.ToString("dd/MM/yyyy HH:mm")
-                                                            </RadzenAccordionItem>
-                                                            <RadzenAccordionItem Text="Drop Off Date">
-                                                                @service.dropOffDate.ToString("dd/MM/yyyy HH:mm")
-                                                            </RadzenAccordionItem> *@
+                                                            @(service.dropOffDate.TimeOfDay == TimeSpan.Zero ? service.dropOffDate.ToString("dd/MM/yyyy") : service.dropOffDate.ToString("dd/MM/yyyy HH:mm"))
                                                             <RadzenAccordionItem Text="See Voucher">
-                                                                <RadzenLink Icon="open_in_browser" Path="@service.serviceVoucher" Text="Open" />
+                                                                <RadzenLink class="rz-button rz-button-xs rz-variant-filled rz-primary rz-shade-default" Path="@service.serviceVoucher" Icon="public" Text="Open"  />
+@*                                                                 <RadzenLink Style="color:white; background-color: #1151f3; padding: 2px 4px; font-size: 0.75rem; font-weight: 600; border-radius: 4px;"Path="@service.serviceVoucher">
+                                                                    <RadzenIcon Icon="open_in_browser" Style="font-size: 15px;"></RadzenIcon>
+                                                                    Open
+                                                                </RadzenLink> *@
+                                                            </RadzenAccordionItem>
+                                                            <RadzenAccordionItem Text="See Rooming List">
+                                                                <RadzenButton class="rz-link" Click="() => OpenRoomingListDialog(service.roomingList)" Icon="assignment" Text="Open" Size="ButtonSize.ExtraSmall"> </RadzenButton>
+                                                                @* <RadzenHtmlEditor @bind-Value=@service.roomingList style="height: 300px;" Disabled="true" ShowToolbar="false"/>*@
+                                                                @* <RadzenButton style="width: 100px" Wrap="FlexWrap.Wrap" Icon="description" BusyText="Opening" IsBusy=@busypdf Click="() => OnBusyClickPDF(service.pdfRoomingList)" Text="Open" Size="ButtonSize.ExtraSmall" /> *@
                                                             </RadzenAccordionItem>
                                                         </Items>
                                                     </RadzenAccordion>
@@ -65,13 +94,10 @@
                 </Items>
             </RadzenAccordion>
         </div>
-        <div class="row" style="margin-bottom: 4px">
-            <div class="col-md-3">
-                <RadzenLabel Text="Itinerary:" Style="font-weight: bold;" />
-            </div>
-            <div class="col">
-                <RadzenButton style="width: 100px" Wrap="FlexWrap.Wrap" Icon="description" BusyText="Opening" IsBusy=@busy Click=@OnBusyClick Text="Open" Size="ButtonSize.Small" />
-            </div>
+    <div class="row" style="margin-bottom: 16px">
+        <div class="col-md-3">
+            <RadzenLabel Text="Itinerary:" Style="font-weight: bold;" />
+            <RadzenButton style="width: 100px" Wrap="FlexWrap.Wrap" Icon="description" BusyText="Opening" IsBusy=@busy Click="() => OnBusyClickWord(model.bookingItinerary)" Text="Open" Size="ButtonSize.Small" />
         </div>
     </div>
     <div class="row" style="margin-bottom: 16px">
@@ -79,7 +105,7 @@
             <RadzenLabel Text="Booking Start Date:" Style="font-weight: bold;" />
         </div>
         <div class="col">
-            <RadzenLabel Text="@model.pickUpDate.ToString("dd/MM/yyyy HH:mm")"/>
+            <RadzenLabel>@(model.pickUpDate.TimeOfDay == TimeSpan.Zero ? model.pickUpDate.ToString("dd/MM/yyyy") : model.pickUpDate.ToString("dd/MM/yyyy HH:mm"))</RadzenLabel>
         </div>
     </div>
     <div class="row" style="margin-bottom: 80px">
@@ -87,15 +113,17 @@
             <RadzenLabel Text="Booking End Date:" Style="font-weight: bold;" />
         </div>
         <div class="col">
-            <RadzenLabel Text="@model.dropOffDate.ToString("dd/MM/yyyy HH:mm")"/>
+            <RadzenLabel>@(model.dropOffDate.TimeOfDay == TimeSpan.Zero ? model.dropOffDate.ToString("dd/MM/yyyy") : model.dropOffDate.ToString("dd/MM/yyyy HH:mm"))</RadzenLabel>
         </div>
-    </div> 
+    </div>
 </RadzenTemplateForm>
 @code {
     [Parameter]
-    public ServiceDetailsDTO ServiceDetails { get; set; }
+    public BookingFinalDocsDTO ServiceDetails { get; set; }
 
-    ServiceDetailsDTO model = new ServiceDetailsDTO();
+    private RoomingListDTO RoomingList = new RoomingListDTO();
+
+    BookingFinalDocsDTO model = new BookingFinalDocsDTO();
 
     protected override void OnParametersSet()
     {
@@ -104,25 +132,33 @@
 
     bool busy;
 
+    private async void OpenRoomingListDialog(string roomingList)
+    {
+        // DialogService.Open<RoomingListDialog>("Rooming List", new Dictionary<string, object>() {
+        //     { "RoomingListContent", roomingList }
+        // });
+        RoomingList.RoomingListData = roomingList;
+        var data = await DialogService.OpenAsync<RoomingListDialog>("Rooming List", new Dictionary<string, object> { { "RoomingList", RoomingList } });
+    }
+
     private void OnClick(string text)
     {
         NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Button Clicked", Detail = text });
     }
 
-    async Task OnBusyClick()
+    private async Task OnBusyClickWord(AttachmentDTO attachment)
     {
         busy = true;
-        await OpenWordDocument();
+        await OpenWordDocument(attachment);
         await Task.Delay(2000);
         busy = false;
-    }
-
-    private async Task OpenWordDocument()
+    }    
+    
+    private async Task OpenWordDocument(AttachmentDTO attachment)
     {
         // Retrieve the file data and file name from model
-        var fileData = model.bookingItinerary.file;
-        var fileName = model.bookingItinerary.fileName;
-
+        var fileData = attachment.file;
+        var fileName = attachment.fileName;
         // Save the file data as a Word document
         string filePath = await SaveFileAsync(fileData, fileName);
 
@@ -146,26 +182,13 @@
         // Windows-specific code
         var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         #endif
-
         // Combine the path with the file name
         string filePath = Path.Combine(documentsPath, fileName);
         // // Define a path to save the file
         // string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName);
-
         // Write the file data to the specified path
         await File.WriteAllBytesAsync(filePath, fileData);
-
         // Return the file path
         return filePath;
     }
-
-    // // Method to open the Word document using the Launcher class
-    // private async void OpenWordDocument(string filePath)
-    // {
-    //     await Launcher.Default.OpenAsync(new OpenFileRequest
-    //         {
-    //             File = new ReadOnlyFile(filePath)
-    //         });
-    // }
-
 }

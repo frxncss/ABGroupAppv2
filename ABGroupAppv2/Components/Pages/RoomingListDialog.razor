@@ -1,0 +1,20 @@
+﻿@using Radzen.Blazor
+@using ABGroupAppv2
+@inject IJSRuntime JS
+@inject DialogService DialogService
+
+<RadzenTemplateForm TItem="RoomingListDTO" Data="@model">
+    <RadzenHtmlEditor @bind-Value=@model.RoomingListData style="height: 100vh;" Disabled="true" ShowToolbar="false" id="roomingListEditor" />
+</RadzenTemplateForm>
+
+@code {
+    [Parameter]
+    public RoomingListDTO RoomingList { get; set; }
+
+    RoomingListDTO model = new RoomingListDTO();
+
+    protected override void OnParametersSet()
+    {
+        model = RoomingList;
+    }
+}

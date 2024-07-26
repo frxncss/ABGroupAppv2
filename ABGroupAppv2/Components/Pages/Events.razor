@@ -6,6 +6,7 @@
 @using MySql.Data.MySqlClient
 @using Newtonsoft.Json
 @inject IWordDocumentService WordDocumentService
+@inject NotificationService NotificationService
 
 @if (!isLoading)
 {
@@ -60,7 +61,7 @@ else{
 
     }
 
-    async Task getBookingService(DateTime initialDate, DateTime finalDate)
+    private async Task getBookingService(DateTime initialDate, DateTime finalDate)
     {
         var supplier = await SecureStorage.GetAsync("SupplierCode") ?? "KEL004";
         var client = new HttpClient();
@@ -78,7 +79,7 @@ else{
         isLoading = true;
     }
 
-    
+
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {
@@ -98,7 +99,7 @@ else{
         // getBookingService(DateTime.Now, DateTime.Now);
     }
 
-    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
+    private async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
     {
         // var bookingRef = args.Data.bookingReference;
         // var pickUp = args.Data.pickUpDate;
@@ -112,21 +113,38 @@ else{
 
         var client = new HttpClient();
         var request = new HttpRequestMessage(HttpMethod.Get, $"https://web.abbey.ie/AbbeyGroupIR/api/BHD/GetBookingItineraryVoucher?bookingReference={args.Data.Text}&pickUpDate={args.Data.Start.ToString("yyyy-MM-dd")}&dropOffDate={args.Data.End.ToString("yyyy-MM-dd")}");
-        var response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-        var booking = (JsonConvert.DeserializeObject<ServiceDetailsDTO>(response.Content.ReadAsStringAsync().Result));
-        booking.pickUpDate = args.Data.Start;
-        booking.dropOffDate = args.Data.End;
-        if(booking.bookingService != null || booking.bookingItinerary != null || booking.consultantName != null)
+        try
         {
-            var data = await DialogService.OpenAsync<EditEvent>("Booking Information", new Dictionary<string, object> { { "ServiceDetails", booking } });
-        }else
-        {
-            var data = await DialogService.OpenAsync<EditPendingEvent>("Booking Information", new Dictionary<string, object> { { "ServiceDetails", booking } });
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var booking = (JsonConvert.DeserializeObject<BookingFinalDocsDTO>(response.Content.ReadAsStringAsync().Result));
+            booking.pickUpDate = args.Data.Start;
+            booking.dropOffDate = args.Data.End;
+            if (booking.bookingService != null || booking.bookingItinerary != null || booking.consultantName != null)
+            {
+                var data = await DialogService.OpenAsync<EditEvent>("Booking Information", new Dictionary<string, object> { { "ServiceDetails", booking } });
+            }
+            else
+            {
+                var data = await DialogService.OpenAsync<EditPendingEvent>("Booking Information", new Dictionary<string, object> { { "ServiceDetails", booking } });
+            }
         }
+        catch(Exception e)
+        {
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error - Event details", Detail = "Event details didn't load correctly, please try again.", Duration = 4000 });
+            NavigationManager.NavigateTo("/event", forceLoad: true);
+        }
+
+
+
         await scheduler.Reload();
         //NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
 
+    }
+
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
     }
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)

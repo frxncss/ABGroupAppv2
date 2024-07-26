@@ -5,6 +5,20 @@
 a, .btn-link {
     color: #006bb7;
 }
+.rz-accordion-toggle-icon.rzi-chevron-right:before {
+    content: "ads_click" !important;
+    color: blue;
+}
+#rz-accordiontab-0:hover {
+    border-radius: 3px 4px;
+    background-color: #E8E8E8 !important;
+    width: 125px !important;
+}
+.rz-accordion-toggle-icon.rzi-chevron-down::before {
+    content: "arrow_drop_down_circle" !important;
+    color: blue;
+}
+
 ::-webkit-scrollbar {
     width: 3px; /* Width of the scrollbar */
     height: 3px;

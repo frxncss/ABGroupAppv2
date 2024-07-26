@@ -6,7 +6,7 @@
 @inject IWordDocumentService WordDocumentService
 
 
-<RadzenTemplateForm TItem="ServiceDetailsDTO" Data="@model">
+<RadzenTemplateForm TItem="BookingFinalDocsDTO" Data="@model">
     <div class="row" style="margin-bottom: 16px;">
         <div class="col-md-3">
             <RadzenLabel Text="Booking Reference:" Style="font-weight: bold;" /><RadzenLabel Text="N/A" Name="BookingRef" />
@@ -55,9 +55,9 @@
 </RadzenTemplateForm>
 @code {
     [Parameter]
-    public ServiceDetailsDTO ServiceDetails { get; set; }
+    public BookingFinalDocsDTO ServiceDetails { get; set; }
 
-    ServiceDetailsDTO model = new ServiceDetailsDTO();
+    BookingFinalDocsDTO model = new BookingFinalDocsDTO();
 
     protected override void OnParametersSet()
     {

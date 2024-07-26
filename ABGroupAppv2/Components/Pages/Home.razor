@@ -29,7 +29,11 @@ else
                                 PagerHorizontalAlign="HorizontalAlign.Left" PageSize="3" ExpandMode="DataGridExpandMode.Single">
                         <Template>
                             <RadzenCard Style="margin-bottom:20px" class="rz-border-primary">
-                                <b>Information:</b>
+@*                             @foreach (var service in )
+                            {
+                                <b>Information:</b> @service.
+                            } *@
+
                                 <RadzenAccordion Multiple="true">
 
                                 </RadzenAccordion>
@@ -71,6 +75,7 @@ else
 
 @code {
     private bool IsAuthenticated;
+    DateTime todayprecise = DateTime.Today;
     DateTime today = DateTime.Today;
     IList<Appointment> appointments = new List<Appointment>();
     IList<Appointment> filteredAppointments = new List<Appointment>();
@@ -129,16 +134,38 @@ else
             var bookingRef = booking.bookingReference;
             var pickUp = booking.pickUpDate;
             var dropOff = booking.dropOffDate;
-            appointments.Add(new Appointment { Start = pickUp, End = dropOff.AddMinutes(-1), Text = bookingRef });
+            appointments.Add(new Appointment { Start = pickUp, End = dropOff, Text = bookingRef });
 
         }
         foreach (var events in appointments)
         {
-            if (today >= events.Start && today <= events.End)
+            // if (events.Start.Date <= today.Date && events.End.Date >= today.Date)
+            if ((today.Date >= events.Start.Date) && (today.Date <= events.End.Date))
             {
                 filteredAppointments.Add(events);
             }
         }
+    }
+
+    private async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
+    {
+        // var bookingRef = args.Data.bookingReference;
+        // var pickUp = args.Data.pickUpDate;
+        // var dropOff = args.Data.dropOffDate;
+        var copy = new Appointment
+            {
+                Start = args.Data.Start,
+                End = args.Data.End,
+                Text = args.Data.Text
+            };
+        var client = new HttpClient();
+        var request = new HttpRequestMessage(HttpMethod.Get, $"https://web.abbey.ie/AbbeyGroupIR/api/BHD/GetBookingItineraryVoucher?bookingReference={args.Data.Text}&pickUpDate={args.Data.Start.ToString("yyyy-MM-dd")}&dropOffDate={args.Data.End.ToString("yyyy-MM-dd")}");
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var booking = (JsonConvert.DeserializeObject<BookingFinalDocsDTO>(response.Content.ReadAsStringAsync().Result));
+        booking.pickUpDate = args.Data.Start;
+        booking.dropOffDate = args.Data.End;
+        
     }
 
     // private void FilterAppointmentsForToday()

@@ -138,10 +138,4 @@
         }
 
     }
-    private void ShowForgotPasswordDialog()
-    {
-        DialogService.Open<PasswordResetEvent>("Password Reset", new Dictionary<string, object>() {
-            { "Email", email }
-        });
-    }
 }
