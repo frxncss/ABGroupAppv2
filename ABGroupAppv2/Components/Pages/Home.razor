@@ -29,10 +29,10 @@ else
                                 PagerHorizontalAlign="HorizontalAlign.Left" PageSize="3" ExpandMode="DataGridExpandMode.Single">
                         <Template>
                             <RadzenCard Style="margin-bottom:20px" class="rz-border-primary">
-@*                             @foreach (var service in )
+                            @foreach (var service in filteredAppointments)
                             {
-                                <b>Information:</b> @service.
-                            } *@
+                                <RadzenLabel><b>Information: </b> @service.Text </RadzenLabel>
+                            }
 
                                 <RadzenAccordion Multiple="true">
 

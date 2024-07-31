@@ -9,11 +9,12 @@ a, .btn-link {
     content: "ads_click" !important;
     color: blue;
 }
+
 #rz-accordiontab-0:hover {
     border-radius: 3px 4px;
-    background-color: #E8E8E8 !important;
-    width: 125px !important;
+    width: 200px !important;
 }
+
 .rz-accordion-toggle-icon.rzi-chevron-down::before {
     content: "arrow_drop_down_circle" !important;
     color: blue;

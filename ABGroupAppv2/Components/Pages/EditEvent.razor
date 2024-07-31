@@ -32,14 +32,11 @@
                     <RadzenAccordion Multiple="true">
                         <Items>
                             <RadzenAccordionItem Text="Show Details">
-
-                                    <RadzenLabel>Adults: @ServiceDetails.adults</RadzenLabel>
-                                    <RadzenLabel>Guides: @ServiceDetails.guides</RadzenLabel>
-                                    <RadzenLabel>Children: @ServiceDetails.children</RadzenLabel>
-                                    <RadzenLabel>Drivers: @ServiceDetails.drivers</RadzenLabel>
-                                    <RadzenLabel>Tourleaders: @ServiceDetails.tourLeader</RadzenLabel>
-                                
-
+                                    <RadzenLabel>Adults: @ServiceDetails.adults</RadzenLabel><br />
+                                    <RadzenLabel>Guides: @ServiceDetails.guides</RadzenLabel><br />
+                                    <RadzenLabel>Children: @ServiceDetails.children</RadzenLabel><br />
+                                    <RadzenLabel>Drivers: @ServiceDetails.drivers</RadzenLabel><br />
+                                    <RadzenLabel>Tourleaders: @ServiceDetails.tourLeader</RadzenLabel><br />
                             </RadzenAccordionItem>
                         </Items>
                     </RadzenAccordion>
@@ -70,7 +67,7 @@
                                                             <RadzenLabel Text="Drop Off Date:" Style="font-weight: bold;"></RadzenLabel>
                                                             @(service.dropOffDate.TimeOfDay == TimeSpan.Zero ? service.dropOffDate.ToString("dd/MM/yyyy") : service.dropOffDate.ToString("dd/MM/yyyy HH:mm"))
                                                             <RadzenAccordionItem Text="See Voucher">
-                                                                <RadzenLink class="rz-button rz-button-xs rz-variant-filled rz-primary rz-shade-default" Path="@service.serviceVoucher" Icon="public" Text="Open"  />
+                                                                <RadzenLink class="rz-button rz-button-xs rz-variant-filled rz-primary rz-shade-default" Path="@service.serviceVoucher" Icon="public" Text="Open"/>
 @*                                                                 <RadzenLink Style="color:white; background-color: #1151f3; padding: 2px 4px; font-size: 0.75rem; font-weight: 600; border-radius: 4px;"Path="@service.serviceVoucher">
                                                                     <RadzenIcon Icon="open_in_browser" Style="font-size: 15px;"></RadzenIcon>
                                                                     Open

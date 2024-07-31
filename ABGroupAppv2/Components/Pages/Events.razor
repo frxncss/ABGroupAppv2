@@ -8,7 +8,7 @@
 @inject IWordDocumentService WordDocumentService
 @inject NotificationService NotificationService
 
-@if (!isLoading)
+@if (!isLoading || !IsAuthenticated)
 {
      <div style="display: flex; justify-content: center; align-items: center; height: 100vh;"> 
         <RadzenStack AlignItems="AlignItems.Center" Class="rz-m-12" Gap="0.5rem">
@@ -31,6 +31,8 @@ else{
                 <RadzenText TextStyle="TextStyle.Button">Completed</RadzenText>
                 <RadzenIcon Icon="circle" IconColor="Blue" />
                 <RadzenText TextStyle="TextStyle.Button">Pending</RadzenText>
+                <RadzenIcon Icon="circle" IconColor="Yellow" />
+                <RadzenText TextStyle="TextStyle.Button">Draft</RadzenText>
             </RadzenRow>
         </div>
     </RadzenScheduler>
@@ -50,33 +52,76 @@ else{
     //     0new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "GREM550344" }
     //GRE013 };
     bool isLoading = false;
+    private bool IsAuthenticated;
     DateTime tomorrow = DateTime.Today.AddDays(1);
     IList<Appointment> appointments = new List<Appointment>();
 
     protected override async Task OnInitializedAsync()
     {
-        var today = DateTime.Today;
-        var startOfMonth = new DateTime(today.Year, today.Month, 1);
-        await getBookingService(startOfMonth, startOfMonth.AddMonths(1));
+        // Check if user is authenticated, if not, redirect to login page
+        var isAuthenticated = await CheckAuthenticationAsync(); // Implement this method to check if the user is authenticated
+        if (!isAuthenticated)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            IsAuthenticated = true;
+            var today = DateTime.Today;
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            await getBookingService(startOfMonth, startOfMonth.AddMonths(2));
+        }
 
+    }
+
+    private async Task<bool> CheckAuthenticationAsync()
+    {
+        // Retrieve authentication token securely
+        try
+        {
+            // Retrieve authentication token securely
+            var authKey = await SecureStorage.GetAsync("IsLoggedIn");
+
+            // Check if authentication token is null or not equal to "Authenticated"
+            if (authKey != null && authKey == "Authenticated")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
     }
 
     private async Task getBookingService(DateTime initialDate, DateTime finalDate)
     {
-        var supplier = await SecureStorage.GetAsync("SupplierCode") ?? "KEL004";
-        var client = new HttpClient();
-        var request = new HttpRequestMessage(HttpMethod.Get, $"https://web.abbey.ie/AbbeyGroupIR/api/BHD/GetBookingBySupplier?supplier={supplier}&initialDate={initialDate.ToString("yyyy-MM-dd")}&finalDate={finalDate.ToString("yyyy-MM-dd")}");
-        var response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-        var bookings = (JsonConvert.DeserializeObject<List<SupplierBookingDTO>>(response.Content.ReadAsStringAsync().Result));
-        foreach (var booking in bookings)
+        var supplier = await SecureStorage.GetAsync("SupplierCode");
+        if(supplier == null)
         {
-            var bookingRef = booking.bookingReference;
-            var pickUp = booking.pickUpDate;
-            var dropOff = booking.dropOffDate;
-            appointments.Add(new Appointment { Start = pickUp, End = dropOff, Text = bookingRef });
+            NavigationManager.NavigateTo("/login");
         }
-        isLoading = true;
+        else
+        {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://web.abbey.ie/AbbeyGroupIR/api/BHD/GetBookingBySupplier?supplier={supplier}&initialDate={initialDate.ToString("yyyy-MM-dd")}&finalDate={finalDate.ToString("yyyy-MM-dd")}");
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var bookings = (JsonConvert.DeserializeObject<List<SupplierBookingDTO>>(response.Content.ReadAsStringAsync().Result));
+            foreach (var booking in bookings)
+            {
+                var bookingRef = booking.bookingReference;
+                var pickUp = booking.pickUpDate;
+                var dropOff = booking.dropOffDate;
+                appointments.Add(new Appointment { Start = pickUp, End = dropOff, Text = bookingRef });
+            }
+            isLoading = true;
+        }
+
     }
 
 
